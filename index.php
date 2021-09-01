@@ -47,7 +47,7 @@ if (!empty($_SESSION['active'])) {
   <meta name="description" content="">
   <meta name="author" content="">
 
-  <title>Sistema Ventas</title>
+  <title>Sistema Ventas Grupo 1</title>
 
   <!-- Custom fonts for this template-->
   <link rel="stylesheet" href="sistema/vendor/bootstrap/css/bootstrap.min.css">
