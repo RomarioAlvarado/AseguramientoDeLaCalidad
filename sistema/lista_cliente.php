@@ -17,9 +17,9 @@
 					<thead class="thead-dark">
 						<tr>
 							<th>ID</th>
-							<th>DNI</th>
+							<th>DPI</th>
 							<th>NOMBRE</th>
-							<th>TELEFONO</th>
+							<th>TELÉFONO</th>
 							<th>DIRECCIÓN</th>
 							<?php if ($_SESSION['rol'] == 1) { ?>
 							<th>ACCIONES</th>

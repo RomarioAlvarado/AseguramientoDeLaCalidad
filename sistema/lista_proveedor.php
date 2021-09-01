@@ -16,8 +16,8 @@
 					<thead class="thead-dark">
 						<tr>
 							<th>ID</th>
-							<th>RUC</th>
-							<th>PROVEEDOR</th>
+							<th>NOMBRE DE CONTACTO</th>
+							<th>NOMBRE DEL PROVEEDOR</th>
 							<th>TELEFONO</th>
 							<th>DIRECCION</th>
 							<?php if ($_SESSION['rol'] == 1) { ?>

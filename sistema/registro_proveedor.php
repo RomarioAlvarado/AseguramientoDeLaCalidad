@@ -51,11 +51,11 @@ mysqli_close($conexion);
                 <form action="" autocomplete="off" method="post" class="card-body p-2">
                     <?php echo isset($alert) ? $alert : ''; ?>
                     <div class="form-group">
-                        <label for="nombre">NOMBRE</label>
+                        <label for="nombre">NOMBRE DE PROVEEDOR</label>
                         <input type="text" placeholder="Ingrese nombre" name="proveedor" id="nombre" class="form-control">
                     </div>
                     <div class="form-group">
-                        <label for="contacto">RUC</label>
+                        <label for="contacto">NOMBRE DE CONTACTO</label>
                         <input type="text" placeholder="Ingrese nombre del contacto" name="contacto" id="contacto" class="form-control">
                     </div>
                     <div class="form-group">

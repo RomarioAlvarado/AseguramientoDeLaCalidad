@@ -1,11 +1,11 @@
 -- phpMyAdmin SQL Dump
--- version 5.0.2
+-- version 5.1.1
 -- https://www.phpmyadmin.net/
 --
 -- Servidor: 127.0.0.1
--- Tiempo de generación: 09-03-2021 a las 10:49:05
--- Versión del servidor: 10.4.14-MariaDB
--- Versión de PHP: 7.4.9
+-- Tiempo de generación: 01-09-2021 a las 20:28:07
+-- Versión del servidor: 10.4.20-MariaDB
+-- Versión de PHP: 7.4.22
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 START TRANSACTION;
@@ -25,7 +25,7 @@ DELIMITER $$
 --
 -- Procedimientos
 --
-CREATE  PROCEDURE `actualizar_precio_producto` (IN `n_cantidad` INT, IN `n_precio` DECIMAL(10,2), IN `codigo` INT)  BEGIN
+CREATE DEFINER=`root`@`localhost` PROCEDURE `actualizar_precio_producto` (IN `n_cantidad` INT, IN `n_precio` DECIMAL(10,2), IN `codigo` INT)  BEGIN
 DECLARE nueva_existencia int;
 DECLARE nuevo_total decimal(10,2);
 DECLARE nuevo_precio decimal(10,2);
@@ -47,14 +47,14 @@ UPDATE producto SET existencia = nueva_existencia, precio = nuevo_precio WHERE c
 SELECT nueva_existencia, nuevo_precio;
 END$$
 
-CREATE  PROCEDURE `add_detalle_temp` (`codigo` INT, `cantidad` INT, `token_user` VARCHAR(50))  BEGIN
+CREATE DEFINER=`root`@`localhost` PROCEDURE `add_detalle_temp` (`codigo` INT, `cantidad` INT, `token_user` VARCHAR(50))  BEGIN
 DECLARE precio_actual decimal(10,2);
 SELECT precio INTO precio_actual FROM producto WHERE codproducto = codigo;
 INSERT INTO detalle_temp(token_user, codproducto, cantidad, precio_venta) VALUES (token_user, codigo, cantidad, precio_actual);
 SELECT tmp.correlativo, tmp.codproducto, p.descripcion, tmp.cantidad, tmp.precio_venta FROM detalle_temp tmp INNER JOIN producto p ON tmp.codproducto = p.codproducto WHERE tmp.token_user = token_user;
 END$$
 
-CREATE  PROCEDURE `data` ()  BEGIN
+CREATE DEFINER=`root`@`localhost` PROCEDURE `data` ()  BEGIN
 DECLARE usuarios int;
 DECLARE clientes int;
 DECLARE proveedores int;
@@ -70,12 +70,12 @@ SELECT usuarios, clientes, proveedores, productos, ventas;
 
 END$$
 
-CREATE  PROCEDURE `del_detalle_temp` (`id_detalle` INT, `token` VARCHAR(50))  BEGIN
+CREATE DEFINER=`root`@`localhost` PROCEDURE `del_detalle_temp` (`id_detalle` INT, `token` VARCHAR(50))  BEGIN
 DELETE FROM detalle_temp WHERE correlativo = id_detalle;
 SELECT tmp.correlativo, tmp.codproducto, p.descripcion, tmp.cantidad, tmp.precio_venta FROM detalle_temp tmp INNER JOIN producto p ON tmp.codproducto = p.codproducto WHERE tmp.token_user = token;
 END$$
 
-CREATE  PROCEDURE `procesar_venta` (IN `cod_usuario` INT, IN `cod_cliente` INT, IN `token` VARCHAR(50))  BEGIN
+CREATE DEFINER=`root`@`localhost` PROCEDURE `procesar_venta` (IN `cod_usuario` INT, IN `cod_cliente` INT, IN `token` VARCHAR(50))  BEGIN
 DECLARE factura INT;
 DECLARE registros INT;
 DECLARE total DECIMAL(10,2);
@@ -138,7 +138,7 @@ CREATE TABLE `cliente` (
 
 INSERT INTO `cliente` (`idcliente`, `dni`, `nombre`, `telefono`, `direccion`, `usuario_id`) VALUES
 (1, 123456, 'Público en General', 0, 'S/D', 1),
-(2, 123789, 'Angel sifuentes', 925491523, 'Lima', 1);
+(2, 2147483647, 'Javier Cifuentes', 23894576, 'Ciudad Capital, Guatemala', 1);
 
 -- --------------------------------------------------------
 
@@ -162,7 +162,7 @@ CREATE TABLE `configuracion` (
 --
 
 INSERT INTO `configuracion` (`id`, `dni`, `nombre`, `razon_social`, `telefono`, `email`, `direccion`, `igv`) VALUES
-(1, 2580, 'Vida Informático', 'Vida Informático', 925491523, 'naju@vidainformatico.com', 'Lima - Perú', '1.18');
+(1, 2865000, 'Ventas Online', 'Tecnología', 78899054, 'tecno@ventasonline.com', 'Escuintla-Guatemala', '1.18');
 
 -- --------------------------------------------------------
 
@@ -186,7 +186,10 @@ INSERT INTO `detallefactura` (`correlativo`, `nofactura`, `codproducto`, `cantid
 (1, 1, 1, 10, '50.00'),
 (2, 1, 2, 5, '10.00'),
 (4, 2, 1, 5, '50.00'),
-(5, 3, 4, 1, '13.00');
+(5, 3, 4, 1, '13.00'),
+(6, 4, 1, 3, '250.00'),
+(7, 4, 2, 1, '950.00'),
+(8, 4, 3, 5, '350.00');
 
 -- --------------------------------------------------------
 
@@ -217,6 +220,15 @@ CREATE TABLE `entradas` (
   `usuario_id` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_spanish_ci;
 
+--
+-- Volcado de datos para la tabla `entradas`
+--
+
+INSERT INTO `entradas` (`correlativo`, `codproducto`, `fecha`, `cantidad`, `precio`, `usuario_id`) VALUES
+(1, 2, '2021-09-01 11:40:37', 35, '950.00', 1),
+(2, 3, '2021-09-01 11:42:50', 10, '350.00', 1),
+(3, 4, '2021-09-01 11:43:08', 10, '450.00', 1);
+
 -- --------------------------------------------------------
 
 --
@@ -237,9 +249,7 @@ CREATE TABLE `factura` (
 --
 
 INSERT INTO `factura` (`nofactura`, `fecha`, `usuario`, `codcliente`, `totalfactura`, `estado`) VALUES
-(1, '2021-03-09 10:20:19', 1, 1, '550.00', 1),
-(2, '2021-03-09 10:30:47', 1, 1, '250.00', 1),
-(3, '2021-03-09 10:33:05', 1, 2, '13.00', 1);
+(4, '2021-09-01 12:06:21', 10, 1, '3450.00', 1);
 
 -- --------------------------------------------------------
 
@@ -262,10 +272,10 @@ CREATE TABLE `producto` (
 --
 
 INSERT INTO `producto` (`codproducto`, `codigo`, `descripcion`, `proveedor`, `precio`, `existencia`, `usuario_id`) VALUES
-(1, '12345', 'Naranja', 1, '50.00', 85, 1),
-(2, '321', 'Gaseosa', 1, '10.00', 0, 1),
-(3, '654', 'Galletas', 1, '16.00', 8, 1),
-(4, '987', 'Sandia', 1, '13.00', 3, 1);
+(1, '000001', 'Combo Teclado y Mouse Inalámbrico ', 1, '250.00', 82, 1),
+(2, '000002', 'Pantalla 24\'', 1, '950.00', 34, 1),
+(3, '000003', 'Biométricos Digitales', 3, '350.00', 13, 1),
+(4, '000004', 'Batería para Laptop Latitude 5400', 2, '450.00', 13, 1);
 
 -- --------------------------------------------------------
 
@@ -287,7 +297,9 @@ CREATE TABLE `proveedor` (
 --
 
 INSERT INTO `proveedor` (`codproveedor`, `proveedor`, `contacto`, `telefono`, `direccion`, `usuario_id`) VALUES
-(1, 'Open', '123456', 925491523, 'Lima', 1);
+(1, 'DELL', 'Luis Asturias', 78896644, 'Ciudad Capital, Guatemala', 1),
+(2, 'UPS, Guatemala', 'Mario Luna', 78894578, 'Ciudad Capital, Guatemala', 1),
+(3, 'Inter COM', 'Luisa Fernanda López', 78892345, 'Ciudad Capital, Guatemala', 1);
 
 -- --------------------------------------------------------
 
@@ -328,9 +340,8 @@ CREATE TABLE `usuario` (
 --
 
 INSERT INTO `usuario` (`idusuario`, `nombre`, `correo`, `usuario`, `clave`, `rol`) VALUES
-(1, 'Vida Informatico', 'vida@gmail.com', 'admin', '21232f297a57a5a743894a0e4a801fc3', 1),
-(6, 'Maria Perez Miranda', 'maria@gmail.com', 'maria', '263bce650e68ab4e23f28263760b9fa5', 1),
-(9, 'angel', 'angel@gmail.com', 'angel', 'f4f068e71e0d87bf0ad51e6214ab84e9', 2);
+(1, 'Romario Alvarado', 'romarioalvarado@gmail.com', 'admin', '21232f297a57a5a743894a0e4a801fc3', 1),
+(10, 'Brissia Alejandra', 'brissia97@gmail.com', 'brissia', '11a7c9d6b05b23743afcfb9f7dd9c8a6', 2);
 
 --
 -- Índices para tablas volcadas
@@ -416,25 +427,25 @@ ALTER TABLE `configuracion`
 -- AUTO_INCREMENT de la tabla `detallefactura`
 --
 ALTER TABLE `detallefactura`
-  MODIFY `correlativo` bigint(20) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
+  MODIFY `correlativo` bigint(20) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=9;
 
 --
 -- AUTO_INCREMENT de la tabla `detalle_temp`
 --
 ALTER TABLE `detalle_temp`
-  MODIFY `correlativo` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
+  MODIFY `correlativo` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
 
 --
 -- AUTO_INCREMENT de la tabla `entradas`
 --
 ALTER TABLE `entradas`
-  MODIFY `correlativo` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `correlativo` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
 
 --
 -- AUTO_INCREMENT de la tabla `factura`
 --
 ALTER TABLE `factura`
-  MODIFY `nofactura` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
+  MODIFY `nofactura` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
 
 --
 -- AUTO_INCREMENT de la tabla `producto`
@@ -446,7 +457,7 @@ ALTER TABLE `producto`
 -- AUTO_INCREMENT de la tabla `proveedor`
 --
 ALTER TABLE `proveedor`
-  MODIFY `codproveedor` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+  MODIFY `codproveedor` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
 
 --
 -- AUTO_INCREMENT de la tabla `rol`
@@ -458,7 +469,7 @@ ALTER TABLE `rol`
 -- AUTO_INCREMENT de la tabla `usuario`
 --
 ALTER TABLE `usuario`
-  MODIFY `idusuario` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=10;
+  MODIFY `idusuario` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=11;
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;

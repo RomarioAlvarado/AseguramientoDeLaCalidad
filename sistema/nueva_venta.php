@@ -14,7 +14,7 @@
                         <div class="row">
                             <div class="col-lg-4">
                                 <div class="form-group">
-                                    <label>Dni</label>
+                                    <label>DPI</label>
                                     <input type="number" name="dni_cliente" id="dni_cliente" class="form-control">
                                 </div>
                             </div>
